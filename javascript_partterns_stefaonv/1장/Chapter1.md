@@ -45,6 +45,6 @@
 >
 >
 DOM, BOM, 규정외 호스트 객체를 제외한 코어 자바스크립트 프로그래밍언어는 ECMAScript 표준에 기반을 두고 있다.
-strict 모드, arguments.call, Object.create() 등의 변경사항이 있다.
+strict 모드, `arguments.call`, `Object.create()` 등의 변경사항이 있다.
 >
 >
