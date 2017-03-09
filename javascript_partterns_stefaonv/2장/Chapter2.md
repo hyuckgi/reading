@@ -79,24 +79,27 @@
     <!-- JSLint에서는 ++ 방법을 '과도한 기교'를 조장한다는 이유에서 권장하지 않음 i+=1 or i = i+1 -->
 ```
 
-* 미세최적화 패턴
-    - 변수하나를 덜 쓴다(max가 없다)
+* 미세최적화 패턴 #1
+> 변수하나를 덜 쓴다(max가 없다)
+
 ```javascript
-        var i, myarrary = [];
-        for(i=myarrary.length; i--;){
-            myarrary[i];
-        }
+    var i, myarrary = [];
+    for(i=myarrary.length; i--;){
+        myarrary[i];
+    }
 ```
-    - 카운트를 거꾸로 하여 0으로 내려간다.
+* 미세최적화 패턴 #2
+> 카운트를 거꾸로 하여 0으로 내려간다.
+
 ```javascript
-        var myarrary = [],
-            i = myarrary.length;
+    var myarrary = [],
+        i = myarrary.length;
 
-        while (i--) {
-            myarrary[i]
-        }
+    while (i--) {
+        myarrary[i]
+    }
 
-        <!-- 0과 비교하는 것이 배열의 length 또는 0이 아닌 값고 비교하는 것보다 대개 더 빠르기 때문이다. -->
+    <!-- 0과 비교하는 것이 배열의 length 또는 0이 아닌 값고 비교하는 것보다 대개 더 빠르기 때문이다. -->
 ```
 
 ## `for-in`루프
@@ -130,13 +133,13 @@
 ```
 
 ## `switch`패턴
+### 가독성과 견고성을 향상하는 switch문 코딩패턴
 ```javascript
-    <!-- 가독성과 견고성을 향상하는 코딩패턴 -->
     var inspect_me = 0,
         result = "";
 
     switch (inspect_me) {
-    case 0:                 <!-- case문을 switch문과 같은 줄로 정렬한다 -->
+    case 0:                 
         result = "zero";
         break;
     case 1:
@@ -145,6 +148,10 @@
     default:
         result = "unkwon"
     }
+    <!--
+        case문을 switch문과 같은 줄로 정렬한다.
+        더 보기 어려운 듯한 느낌아닌 느낌..
+    -->
 ```
 
 ## 암묵적 타입캐스팅 피하기
@@ -207,5 +214,47 @@
         Function("console.log(typeof local);")(); <!-- undefined -->
     }());
 ```
-## parseInt()를 통한 숫자 변환
-    1.
+## `parseInt()`를 통한 숫자 변환
+* `parseInt()`를 사용하면 문자열로부터 숫자 값을 얻을 수 있다. \
+    함수의 두번째 매개변수로 기수를 받는데 기수를 입력해주는 것이 좋다.
+    > ES3에서는 0으로 시작하는 문자열은 8진수로 다뤄진다.
+
+```javascript
+    var month = "06",
+        year = "09";
+    month = parseInt(month, 10);
+    year = parseInt(year, 10);
+```
+* 문자를 숫자로 바꾸는 또 다른 방법
+```javascript
+    +"08"
+    number("08")
+    <!-- parseInt()보다 빠르지만 문자열이 포함되었을때는 NaN이 반환된다 -->
+```
+## 코딩규칙
+* 들여쓰기 : 케바케지만 JSLint는 스페이스 4칸
+* 중괄호 : 한줄로 처리되는 `for`문 `if`문에서도 중괄호는 항상 쓰자
+* 여는 중괄호 위치 : 선행명령문과 같은줄(줄바뀜이 일어나기전)에 열어주자, `return`을 만났을때 예상하는것과 다른 결과가 초래될 수 있다.
+* 공백 : 쉼표와 마침표의 자리에 공백을 준다.
+```javascript
+    <!-- 익명함수 표현식에서 function다음 -->
+    var myFunc = function () {};
+
+    <!-- 모든 연산자와 피연산자를 공백으로 분리하는 것도 좋은 예이다 -->
+    var d = 0,
+        a = b + 1;
+    if ( a && b && c) {
+        d = a % c;
+        a += d;
+    }
+
+    <!--
+        이외에는 함수, if-else문, 루프, 객체 리터럴의 여는 중괄호 전,
+        닫는 중괄호와 else 또는 while 사이
+    -->
+```
+## 명명 규칙
+* 생성자는 대문자로 시작
+* 단어구분은 낙타표기법(camelCase)로 쓰고, 변수는 `first_name`처럼 밑줄로 단어를 분리하는 것도 좋은 방법이다.
+* 상수처럼 사용할 변수는 대문자와 밑줄
+* 비공개메서드는 밑줄을 접두어(JSLint를 통과하려면 `nomen:false` 옵션 추가)
