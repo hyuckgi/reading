@@ -74,7 +74,7 @@
 
     <!-- 커링된 add 함수 -->
     var add = function(x, y) {
-        var oldx = x, oldy = y;
+        var x = x, oldy = y;
         if( typeof oldy === 'undefined') {   <!-- 부분적인 적용 -->
             return function(newy) {
                 return oldx + newy;
@@ -91,6 +91,44 @@
     var newadd = add.partialApply(null, [5]);
 
     <!-- 새로운 함수에 나머지 인자 적용 -->
-    newadd.apply(null, [4]);   
+    newadd.apply(null, [4]);
+
+    <!-- 기본개념은 함수내부에 클로저를 만드는 것 -->
+
+    <!-- add() 함수 리팩토링 -->
+    var add = function(x, y) {
+        if( typeof y === 'undefined') {   <!-- 부분적인 적용 -->
+            return function(y) {
+                return x + y;
+            };
+        }
+        <!-- 전체 인자를 적용 -->
+        return x + y;
+    };
+
+    <!-- 부분적인 매개변수를 받는 범용 함수 -->
+
+    function schonfinkelize(fn) {
+        var slice = Array.prototype.slice,
+            stored_args = slice.call(arguments, 1); <!-- schonfinkelize() 함수를 할당할때의 첫번째 인자를 제외한 나머지를 저장한다. -->
+
+        return function() {
+            var new_args = slice.call(arguments),
+                args = stored_args.concat(new_args);
+            return fn.apply(null, args);
+        };
+    }
+
+    function add(x, y) {
+        return x + y;
+    }
+
+    var newadd = schonfinkelize(add, 5);
+    newadd(4)    <!-- 9 -->
 
 ```
+
+* 커링을 사용해야 하는 경우
+> 어떤 함수를 호출할 때 대부분의 매개변수가 항상 비슷하다면, 커링의 적합한 후보라고 할 수 있다. 매개변수 일부를 적용하여 새로운 함수를 동적으로 생성하면 이 함수는 반복되는 매개변수를 내부적으로 저장하여, 매번 인자를 전달하지 않아도 원본 함수가 기대하는 전체 목록을 미리 채워 놓을 것이다
+
+<!-- 무슨말인지 모르겠지만 클로저로 만든 새로운 함수와 초기함수의 인자에 넘긴 함수를 잘 이용하면 다양한 기능을 만들수 있을 것 같다. --> 
