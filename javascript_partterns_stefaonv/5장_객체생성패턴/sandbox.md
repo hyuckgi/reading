@@ -84,8 +84,6 @@
 
     Sandbox.modules = {};
 
-    Sandbox.modules = {};
-
     Sandbox.modules.event = function(box) {
         box.bar = 'bar';
     };
