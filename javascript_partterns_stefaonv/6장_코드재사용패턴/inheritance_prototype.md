@@ -183,7 +183,7 @@
 > jQuery의 extend()메서드는 깊은 복사를 수행한다.
 
 
-### 새로운 방식의 상속 패턴 2 - 믹스-인
+### 새로운 방식의 상속 패턴 3 - 믹스-인
 > 하나의 객체를 복사하는 것을 넘어 여러 객체에서 복사해온 것을 한 객체 안에 섞어 넣을 수도 있다.
 
 ```javascript
@@ -217,6 +217,105 @@
 > 믹스-인 개념이 공식적으로 내장된 언어에 익숙하다면, 부모에 수정을 가할 경우 자식에도 영향을 미치는 결과를 기대할지도 모르겠다. 그러나 이 구현 방법에서 그런 결과는 나오지 않는다.
 > 단순히 루프를 돌고, 프로퍼티를 복사한 것 뿐이기 때문에 부모 들과의 연결고리는 끊어진 상태다.
 
-~~ 왜? 연결고리가 끊어졌을까.. 위에 extend()함수에서는 참조로 복사가 되었는데 왜 여기서는 아닐까.... arguments로 받아서 일까? ~~
+~~왜? 연결고리가 끊어졌을까.. 위에 extend()함수에서는 참조로 복사가 되었는데 왜 여기서는 아닐까.... arguments로 받아서 일까?~~
 
 > 여기서도 참조객체를 링크 한다. 자식의 프로퍼티를 수정하면 부모의 프로퍼티에도 영향을 준다, 하지만 부모의 프로퍼티를 수정해도 자식은 영향을 받지 않는다. 결론 복사본을 사용하자
+
+### 새로운 방식의 상속 패턴 4 - 메서드 빌려쓰기
+> 쓸일이 없는 모든 메서드를 상속받지 않고 원하는 메서드만 골라서 사용하고 싶다면 메서드 빌려쓰기 패턴을 사용
+> 함수의 메서드인 call(), apply()를 활용해서 다른 객체의 기능을 빌려 올 수 있다.
+
+```javascript
+
+    <!-- call() 예제 -->
+    notmyobj.doStuff.call(myobj, param1, p2, p3);
+
+     <!-- apply() 예제 -->
+    notmyobj.doStuff.apply(myobj, [param1, p2, p3]);
+
+```
+
+* 이 패턴은 배열 메서드를 빌려오는데 많이 사용된다.
+```javascript
+    function f() {
+        var args = [].slice.call(arguments, 1, 3);
+        return args;
+    }
+
+    f(1, 2, 3, 4, 5, 6);    <!-- [2, 3] -->
+    <!-- call()의 두번째 인자는 slice()의 매개변수가 된다 -->
+
+```
+* 빌려쓰기와 바인딩
+> call(), apply()를 사용하거나 단순한 할당을 통해 메서드를 빌려오게 되면, 빌려 온 메서드 안에서 this가 가리키는 객체는 호출식에 따라 정해지게 된다. 그러나 어떤 경우에는 this 값을 고정시키거나 특정 객체에 바인딩되도록 처음부터 정해놓는 것이 최선일 때가 있다.
+
+```javascript
+
+    var one = {
+        name: 'object',
+        say: function (greet) {
+            return greet + ", " + this.name;
+        }
+    };
+
+    one.say("hi"); <!-- hi, object -->
+
+    var two = {
+        name: 'another object'
+    };
+
+    one.say.apply(two, ['hello']);  <!-- hello, another object -->
+    <!-- this가 two가 되었기 때문에 say()의 this.name 은 two의 name을 가리킴 -->
+
+```
+
+```javascript
+
+    <!-- 함수를 변수에 할당하면 함수 안의 this는 전역객체를 가리키게 된다 -->
+    var say = one.say;
+    say("hoho");   <!-- hoho, undefined -->
+
+    <!-- 콜백 함수로 전달한 경우 -->
+    var yetanother = {
+        name: "Yet another object",
+        method: function (callback) {
+            return callback("hola");
+        }
+    };
+
+    yetanother.method(one.say);    <!--holla, undefined -->
+
+```
+> 메서드와 객체를 묶어놓기 위해서는 바인딩을 해야한다.
+
+```javascript
+
+    function bind(o, m) {
+        return function() {
+            return m.apply(o, [].slice.call(arguments));
+        };
+    }
+    <!-- o라는 객체와 m이라는 메서드를 인자로 받은 다음, 이둘을 바인딩한 새로운 함수를 반환하다. -->
+    <!-- 반환되는 함수는 클로저를 통해 o,m에 접근할 수 있다 -->
+    var twosay = bind(two, one.say);
+    twosay("yo") <!-- yo, another object -->
+
+```
+
+* Function.prototype.bind()
+> ECMAScript 5에서는 Function.prototype에 bind() 메서드가 추가되어, apply()나 call()과 마찬가지로 쉽게 사용할 수 있다.
+
+```javascript   
+    <!-- bind() 구현 -->
+    if(typeof Function.prototype.bind === 'undefined') {
+        Function.prototype.bind = function(thisArg) {
+            var fn = this,
+                slice = Array.prototype.slice,
+                args = slice.call(arguments, 1);
+            return function() {
+                return fn.apply(thisArg, args.concat(slice.call(arguments)));
+            };
+        };
+    }
+
+```
