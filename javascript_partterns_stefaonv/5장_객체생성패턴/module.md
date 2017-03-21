@@ -164,7 +164,7 @@
 
     MYAPP.makeObjTree('MYAPP.utilities.array');
 
-    MYAPP.utilities.Array = (function(){
+    MYAPP.utilities.array = (function(){
 
         <!-- 의존관계 선언 -->
         var uobj = MYAPP.utilities.object,
@@ -179,7 +179,7 @@
         };
 
         Constr.prototype = {
-            constructor : MYAPP.utilities.Array,
+            constructor : MYAPP.utilities.array,
             version : "2.0",
             toArray: function(obj){
                 for(var i = 0, a = [], len = obj.length; i<len; i++){
@@ -196,7 +196,7 @@
 
 
     var obj = [1, 3, 4, 5, 43, 45];
-    var arr = new MYAPP.utilities.Array(obj)
+    var arr = new MYAPP.utilities.array(obj)
 
 ```
 
@@ -205,7 +205,7 @@
 
 ```javascript
 
-    MYAPP.utilities.Array = (function(app, global){
+    MYAPP.utilities.array = (function(app, global){
         <!-- 전역 객체에 대한 참조와 -->
         <!-- 전역 애플리케이션 네임스페이스 객체에 대한 참조가 지역 변수화된다 -->
         <!-- code -->
